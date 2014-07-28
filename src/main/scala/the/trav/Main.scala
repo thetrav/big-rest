@@ -10,7 +10,7 @@ import org.json4s.jackson.Serialization.write
 object Main extends App {
   implicit val formats = Serialization.formats(NoTypeHints)
 
-  Database.withDatabase { personStore =>
+  DB.withDatabase { personStore =>
     HttpServer.withServer(8080) {
       case GET(Path("/people")) =>
         val json = write(personStore.all)
