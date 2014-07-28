@@ -3,11 +3,17 @@ Simplest Unfiltered
 
 [![Build Status](https://travis-ci.org/thetrav/simplest-unfiltered.svg?branch=master)](https://travis-ci.org/thetrav/simplest-unfiltered)
 
-A very simple example of a RESTful http service using unfiltered on top of netty so I can show people
+A very simple example of a RESTful http service.
 
-There is a h2 database running in memory 
+Json => json4s
 
+http server implementation => netty
 
+http routing => unfiltered
+
+database interaction => slick
+
+database implementation => h2
 
 To Run
 ======
