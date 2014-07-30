@@ -1,6 +1,7 @@
 package the.trav
 
 import scala.slick.driver.PostgresDriver.simple._
+import scala.slick.jdbc.meta.MTable
 
 object DB {
 
@@ -14,7 +15,10 @@ object DB {
       }
       val people = TableQuery[People]
 
-      people.ddl.create
+
+      if (MTable.getTables("PEOPLE").list().isEmpty) {
+        people.ddl.create
+      }
 
       people += ("first person", 1)
       val personStore = new PersonStore {

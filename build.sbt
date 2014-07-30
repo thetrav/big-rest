@@ -8,3 +8,8 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-nop" % "1.6.4"
 )
 
+name := "big rest"
+
+version := "0.1"
+
+scalaVersion := "2.10.4"
