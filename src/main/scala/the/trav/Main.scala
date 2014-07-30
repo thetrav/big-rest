@@ -11,7 +11,7 @@ object Main extends App {
   implicit val formats = Serialization.formats(NoTypeHints)
 
   DB.withDatabase { personStore =>
-    HttpServer.withServer(8080) {
+    HttpServer.withServer(80) {
       case GET(Path("/people")) =>
         val json = write(personStore.all)
         Ok ~> JsonContent ~> ResponseString(json)
