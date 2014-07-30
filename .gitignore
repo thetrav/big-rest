@@ -4,3 +4,4 @@ target
 project/boot
 project/target
 project/plugins/target
+set_env.sh
