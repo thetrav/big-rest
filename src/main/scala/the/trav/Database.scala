@@ -5,8 +5,22 @@ import scala.slick.jdbc.meta.MTable
 
 object DB {
 
+def dbUrl = {
+  val dbUri = new java.net.URI(System.getenv("DATABASE_URL"))
+  val parts = dbUri.getUserInfo().split(":")
+
+  val username = parts(0)
+  val password = parts(1)
+  val host = dbUri.getHost
+  val port = dbUri.getPort
+  val path = dbUri.getPath
+  s"jdbc:postgresql://$host:$port$path?username=$username&password=$password"
+}
+
+
   def withDatabase(program: PersonStore => Unit) {
-    Database.forURL("jdbc:postgresql:postgres", driver = "org.postgresql.Driver") withSession { implicit session =>
+    println("dburl="+dbUrl)
+    Database.forURL(dbUrl, driver = "org.postgresql.Driver") withSession { implicit session =>
       class People(tag: Tag) extends Table[(String, Int)](tag, "PEOPLE") {
         def name = column[String]("NAME")
         def years = column[Int]("YEARS")
