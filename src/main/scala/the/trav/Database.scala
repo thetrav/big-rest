@@ -14,13 +14,12 @@ def dbUrl = {
   val host = dbUri.getHost
   val port = dbUri.getPort
   val path = dbUri.getPath
-  s"jdbc:postgresql://$host:$port$path?username=$username&password=$password"
+  s(username, password, "jdbc:postgresql://$host:$port$path")
 }
 
 
   def withDatabase(program: PersonStore => Unit) {
-    println("dburl="+dbUrl)
-    Database.forURL(dbUrl, driver = "org.postgresql.Driver") withSession { implicit session =>
+    Database.forURL(dbUrl._3, driver = "org.postgresql.Driver", user = dbUrl._1, password = dbUrl._2) withSession { implicit session =>
       class People(tag: Tag) extends Table[(String, Int)](tag, "PEOPLE") {
         def name = column[String]("NAME")
         def years = column[Int]("YEARS")
