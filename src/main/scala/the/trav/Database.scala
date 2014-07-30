@@ -5,17 +5,17 @@ import scala.slick.jdbc.meta.MTable
 
 object DB {
 
-def dbUrl = {
-  val dbUri = new java.net.URI(System.getenv("DATABASE_URL"))
-  val parts = dbUri.getUserInfo().split(":")
+  def dbUrl = {
+    val dbUri = new java.net.URI(System.getenv("DATABASE_URL"))
+    val parts = dbUri.getUserInfo().split(":")
 
-  val username = parts(0)
-  val password = parts(1)
-  val host = dbUri.getHost
-  val port = dbUri.getPort
-  val path = dbUri.getPath
-  s(username, password, "jdbc:postgresql://$host:$port$path")
-}
+    val username = parts(0)
+    val password = parts(1)
+    val host = dbUri.getHost
+    val port = dbUri.getPort
+    val path = dbUri.getPath
+    (username, password, s"jdbc:postgresql://$host:$port$path")
+  }
 
 
   def withDatabase(program: PersonStore => Unit) {
