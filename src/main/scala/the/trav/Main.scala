@@ -34,6 +34,32 @@ object Main extends App {
           personStore.add(Person(s"${Random.nextInt}", Math.abs(Random.nextInt)))
         }
         Created
+
+      case GET(Path("/people.html")) =>
+      val script = """
+      $(function() {
+        $("#go").click(function() {
+          $.get("http://thetrav-test.apigee.net/people", function(data) {
+            var sum = _.reduce(data, function(accum, person) { return accum + person.years}, 0);
+            $("#output").html(data.length+" elements with "+ (sum/data.length) + " average years");
+          });
+        });
+      });
+      """
+        Ok ~> Html(
+<html>
+  <head>
+    <title>yo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <script>{xml.Unparsed(script)}</script>
+  </head>
+  <body>
+    <input type="button" value="Go" id="go"/>
+    <div id="output"></div>
+  </body>
+</html>
+)
     }
   }
 }
