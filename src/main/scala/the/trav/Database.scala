@@ -42,9 +42,8 @@ object DB {
     db withSession { implicit session =>
       if (MTable.getTables("PEOPLE").list().isEmpty) {
         people.ddl.create
+        people += ("first person", 1)
       }
-
-      people += ("first person", 1)
     }
 
     val personStore = new PersonStore {
