@@ -6,6 +6,7 @@ import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
+import scala.util.Random
 
 object Main extends App {
   implicit val formats = Serialization.formats(NoTypeHints)
@@ -26,6 +27,12 @@ object Main extends App {
         val body = Body.string(req)
         val person = parse(body).extract[Person]
         personStore.add(person)
+        Created
+
+      case POST(Path(Seg("people" :: count :: Nil))) =>
+        (1 to count.toInt).foreach { i =>
+          personStore.add(Person(s"${Random.nextInt}", Math.abs(Random.nextInt)))
+        }
         Created
     }
   }
