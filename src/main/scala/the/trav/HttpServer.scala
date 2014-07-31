@@ -5,7 +5,7 @@ import unfiltered.netty.cycle._
 
 object HttpServer {
   def withServer(port: Int)(handler: Plan.Intent) {
-    val server = Http.local(port).plan(Planify(handler))
+    val server = Http(port).plan(Planify(handler))
     server.start()
     //readLine(s"server starting on $port enter to stop")
     //server.stop()
