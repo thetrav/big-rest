@@ -9,9 +9,11 @@ import org.json4s.jackson.Serialization.write
 
 object Main extends App {
   implicit val formats = Serialization.formats(NoTypeHints)
-
-  DB.withDatabase { personStore =>
-    HttpServer.withServer(System.getenv("PORT").toInt) {
+  import DB._
+  import HttpServer._
+  implicit val dataSource = defaultDataSource(System.getenv("DATABASE_URL"))
+  withDatabase { personStore =>
+    withServer(System.getenv("PORT").toInt) {
       case GET(Path("/people")) =>
         val json = write(personStore.all)
         Ok ~> JsonContent ~> ResponseString(json)

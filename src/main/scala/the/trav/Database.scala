@@ -3,52 +3,70 @@ package the.trav
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.jdbc.meta.MTable
 
+import org.apache.commons.dbcp2.BasicDataSource
+
+
 object DB {
 
-  def dbUrl = {
-    val dbUri = new java.net.URI(System.getenv("DATABASE_URL"))
+  def defaultDataSource(settings: String): BasicDataSource = {
+    val dbUri = new java.net.URI(settings)
     val parts = dbUri.getUserInfo().split(":")
 
-    val username = parts(0)
-    val password = parts(1)
+    val ds = new BasicDataSource
+    ds.setDriverClassName("org.postgresql.Driver")
+    ds.setUsername(parts(0))
+    ds.setPassword(parts(1))
+    ds.setMaxTotal(10)
+    ds.setInitialSize(10)
+    ds.setValidationQuery("SELECT 1")
+    new java.io.File("target").mkdirs // ensure that folder for database exists
+
     val host = dbUri.getHost
     val port = dbUri.getPort
     val path = dbUri.getPath
-    (username, password, s"jdbc:postgresql://$host:$port$path")
+    ds.setUrl(s"jdbc:postgresql://$host:$port$path")
+    ds
   }
 
+  def withDatabase(program: PersonStore => Unit)(implicit dataSource: BasicDataSource){
+    val db = Database.forDataSource(dataSource)
 
-  def withDatabase(program: PersonStore => Unit) {
-    Database.forURL(dbUrl._3, driver = "org.postgresql.Driver", user = dbUrl._1, password = dbUrl._2) withSession { implicit session =>
-      class People(tag: Tag) extends Table[(String, Int)](tag, "PEOPLE") {
-        def name = column[String]("NAME")
-        def years = column[Int]("YEARS")
-        // Every table needs a * projection with the same type as the table's type parameter
-        def * = (name, years)
-      }
-      val people = TableQuery[People]
+    class People(tag: Tag) extends Table[(String, Int)](tag, "PEOPLE") {
+      def name = column[String]("NAME")
+      def years = column[Int]("YEARS")
+      // Every table needs a * projection with the same type as the table's type parameter
+      def * = (name, years)
+    }
+    val people = TableQuery[People] 
 
-
+    db withSession { implicit session =>
       if (MTable.getTables("PEOPLE").list().isEmpty) {
         people.ddl.create
       }
 
       people += ("first person", 1)
-      val personStore = new PersonStore {
-        def all: List[Person] = {
+    }
+
+    val personStore = new PersonStore {
+      def all: List[Person] = {
+        db withSession { implicit session =>
           people.list.map(Person.tupled)
         }
+      }
 
-        def add(person: Person) {
+      def add(person: Person) {
+        db withSession { implicit session =>
           people += (person.name, person.years)
         }
+      }
 
-        def delete(name: String) {
+      def delete(name: String) {
+        db withSession { implicit session =>
           people.filter(_.name.like(name)).delete
         }
       }
-      program(personStore)
     }
+    program(personStore)
   }
 
   trait PersonStore {

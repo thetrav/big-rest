@@ -9,7 +9,8 @@ libraryDependencies ++= Seq(
   "org.json4s"   %% "json4s-jackson" % "3.2.6",
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
   "com.typesafe.slick" %% "slick" % "2.0.2",
-  "org.slf4j" % "slf4j-nop" % "1.6.4"
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
+  "org.apache.commons" % "commons-dbcp2" % "2.0.1"
 )
 
 name := "big rest"
